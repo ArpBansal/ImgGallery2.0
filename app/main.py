@@ -152,7 +152,6 @@ if __name__ == "__main__":
 """
 
 
-from utils import get_img_paths, img_find
 
 '''EMBEDDINGS_DATABASE_PATH = exe/app~path'''
 
@@ -160,38 +159,42 @@ from utils import get_img_paths, img_find
 
 # print("path to images is\n" + dfs[0]['identity'][0])
 # torch.cuda.empty_cache()
-import sys
-import os
+# import sys
+# import os
 
-# To Resolve relative import error
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-from utils import track_image_changes, img_find
+# # To Resolve relative import error
+# SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# sys.path.append(os.path.dirname(SCRIPT_DIR))
+# from utils import track_image_changes, img_find
 
-"""
+
 import sqlite3
 conn = sqlite3.connect("test.db")
 cursor = conn.cursor()
 
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    age INTEGER NOT NULL
-)
+CREATE TABLE IF NOT EXISTS keys_imgs (
+    key INTEGER PRIMARY KEY,
+    path TEXT NOT NULL)
 ''')
 
-# Insert data into the table
-cursor.execute('''
-INSERT INTO users (name, age) VALUES (?, ?)
-''', ('Alice', 30))
+conn.close()
 
-cursor.execute('''
-INSERT INTO users (name, age) VALUES (?, ?)
-''', ('Bob', 25))
+def setup_database(db_path):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS file_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_type TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+    conn.commit()
+    conn.close()
 
-conn.commit()
-conn.close()"""
+setup_database('file_tracking.db')
 
 
 # dfs = img_find(img_path="app/IMG_1540.JPG", db_path="app", label="akriti")

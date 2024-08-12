@@ -1,55 +1,59 @@
 import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '1'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # path=r"/mnt/c/Users/HP/Pictures/Camera Roll"
 import numpy as np
+from datetime import datetime
 # from typing import Optional
-def get_img_paths(path:str):
-    img_paths=[]
+def get_img_metadata(path:str):
+    img_metadata=[]
     if not os.path.exists(path):
         print(f"Directory {path} does not exist.")
         print(f"current working dir: {os.getcwd()}")
     else:
         for root,dir, files in os.walk(path):
-            r=root.removeprefix("/mnt/")
             # self.textbox.setText("checking root dir:")
             # self.textbox.setText(r)
-            print(f"checking root dir: {r}")
-            
+            print(f"checking root dir: {root}")
             print(f"Checking dir: {dir}")
-            img_path=[os.path.abspath(os.path.join(root, file)) for file in files if file.endswith(('.JPG', '.jpg', '.png', '.jpeg'))]
+            
+            # for file in files:
+            #     if file.lower().endswith(('jpg', 'jpeg', 'png')):
+            #             pass
+            
+            img_path=[(os.path.abspath(os.path.join(root, file)),datetime.fromtimestamp(
+                os.path.getmtime(os.path.join(root, file)))
+            ) for file in files if file.lower().endswith(('jpg', 'jpeg', 'png'))]
             if img_path:
-                img_paths.append(img_path)
+                img_metadata.extend(img_path)
                 
-        if not img_paths:
+        if not img_metadata:
             print("no valid img file found, make sure img format is .png, .jpg, .jpeg")
-    return np.array(img_paths).flatten()
+    return img_metadata
 
 
 
+# detector_backend = 'retinaface'
+# from deepface import DeepFace
+# from label_paths import add_pkl_file, retrieve_imgList
+# def img_find(img_path:str, db_path:str, label:str):
+#     paths = retrieve_imgList(identity=label)
+#     if paths is not None:
+#         return paths
+#     else:
+#         img_path = repr(os.path.abspath(img_path))[1:-1]
+#         db_path = repr(os.path.abspath(db_path))[1:-1]
+#         dfs=DeepFace.find(
+#             img_path=img_path,
+#             db_path=db_path,
+#             detector_backend=detector_backend,
+#             model_name="Facenet512",
+#             enforce_detection=False
+#         )
+#         paths = dfs[0]['identity']
+#         add_pkl_file(label=label, img_paths=list(paths))
 
-detector_backend = 'retinaface'
-from deepface import DeepFace
-from label_paths import add_pkl_file, retrieve_imgList
-def img_find(img_path:str, db_path:str, label:str):
-    paths = retrieve_imgList(identity=label)
-    if paths is not None:
-        return paths
-    else:
-        img_path = repr(os.path.abspath(img_path))[1:-1]
-        db_path = repr(os.path.abspath(db_path))[1:-1]
-        dfs=DeepFace.find(
-            img_path=img_path,
-            db_path=db_path,
-            detector_backend=detector_backend,
-            model_name="Facenet512",
-            enforce_detection=False
-        )
-        paths = dfs[0]['identity']
-        add_pkl_file(label=label, img_paths=list(paths))
-
-        return paths
-import os
+#         return paths
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -91,6 +95,7 @@ def track_image_changes(directory, refresh:bool=False, db_embed:str=None, track:
 
     return event_handler.added_image_paths, event_handler.deleted_image_paths
 
-# Example usage:
+def remove_duplicates(input_list):
+    return list(dict.fromkeys(input_list))
 
 
