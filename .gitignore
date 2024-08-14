@@ -4,3 +4,6 @@
 *.txt
 *.ipynb
 *.db
+*.faiss
+*.log
+**/__pycache__

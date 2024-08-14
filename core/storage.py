@@ -94,6 +94,9 @@ def add_keysPath(db_path, keys, paths):
         key INTEGER PRIMARY KEY,
         path TEXT NOT NULL)
         ''')
+        cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_keys_imgs_key ON keys_imgs(key)
+        ''')
         if len(keys) != len(paths):
             raise ValueError("The length of keys and paths lists must be the same.")
         
@@ -122,6 +125,28 @@ cursor.execute("""
 cursor.execute("CREATE INDEX IF NOT EXISTS idx_timestamp ON image_indexing (timestamp)")
 conn.commit()
 conn.close()
+
+def insert_img_metadata_to_db(img_metadata, db_path='test.db'):
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Insert data into the image_indexing table
+        cursor.executemany("""
+            INSERT INTO image_indexing (timestamp, path)
+            VALUES (?, ?)
+        """, img_metadata)
+        
+        # Commit the transaction and close the connection
+        conn.commit()
+
+    except Exception as e:
+        logger.error(e)
+
+    finally:
+        if conn:
+            conn.close()
+            
 
 # os.makedirs(path)
 

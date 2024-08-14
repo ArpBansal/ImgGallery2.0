@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
 
 # print("path to images is\n" + dfs[0]['identity'][0])
-# torch.cuda.empty_cache()
+
 # import sys
 # import os
 
@@ -168,38 +168,8 @@ if __name__ == "__main__":
 # from utils import track_image_changes, img_find
 
 
-import sqlite3
-conn = sqlite3.connect("test.db")
-cursor = conn.cursor()
-
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS keys_imgs (
-    key INTEGER PRIMARY KEY,
-    path TEXT NOT NULL)
-''')
-
-conn.close()
-
-def setup_database(db_path):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS file_events (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        event_type TEXT NOT NULL,
-        file_path TEXT NOT NULL,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-    ''')
-    conn.commit()
-    conn.close()
-
-setup_database('file_tracking.db')
 
 
-# dfs = img_find(img_path="app/IMG_1540.JPG", db_path="app", label="akriti")
-# for p in dfs:
-#     print(p)
 
 # if __name__ == "__main__":
 #     target_directory = "../ubuntu_img_search"

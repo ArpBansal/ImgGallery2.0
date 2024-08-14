@@ -17,9 +17,6 @@ def get_img_metadata(path:str):
             print(f"checking root dir: {root}")
             print(f"Checking dir: {dir}")
             
-            # for file in files:
-            #     if file.lower().endswith(('jpg', 'jpeg', 'png')):
-            #             pass
             
             img_path=[(os.path.abspath(os.path.join(root, file)),datetime.fromtimestamp(
                 os.path.getmtime(os.path.join(root, file)))
