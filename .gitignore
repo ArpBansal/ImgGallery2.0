@@ -7,3 +7,6 @@
 *.faiss
 *.log
 **/__pycache__
+/ImgGallery.egg-info
+tracker.py
+logger.py

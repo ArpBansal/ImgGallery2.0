@@ -13,7 +13,7 @@ if system() == "Windows":
 else :
     dir_path=r"/mnt/c/gallery_2.0/data"
     if not os.path.exists(dir_path):
-        os.makedirs()
+        # os.makedirs()
         path = r"/mnt/c/gallery_2.0/data/test.db"
 
 logging.basicConfig(filename="newfile.log",
@@ -111,6 +111,22 @@ def add_keysPath(db_path, keys, paths):
         if conn:
             conn.close()
 
+def rm_keysPath(db_path:str, keys):
+    try:
+        keys_tuple=tuple(keys_tuple)
+        conn = sqlite3.connect(db_path)
+        cursor=conn.cursor()
+        query = f"DELETE FROM keys_imgs WHERE key IN ({','.join('?'*len(keys_tuple))})"
+        cursor.execute(query, keys_tuple)
+
+    except Exception as e:
+        logger.error(e)
+
+
+    finally:
+        if conn:
+            conn.close()
+
 conn = sqlite3.connect("test.db")
 cursor = conn.cursor()
 
@@ -126,7 +142,7 @@ cursor.execute("CREATE INDEX IF NOT EXISTS idx_timestamp ON image_indexing (time
 conn.commit()
 conn.close()
 
-def insert_img_metadata_to_db(img_metadata, db_path='test.db'):
+def insert_img_metadata_to_db(img_metadata, db_path:str):
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -147,7 +163,42 @@ def insert_img_metadata_to_db(img_metadata, db_path='test.db'):
         if conn:
             conn.close()
             
+def rmImgMetadata(db_path):
+    pass
 
+def ADDdirTracked(db:str, dir:str):
+    try:
+        conn=sqlite3.connect(database=db)
+        cursor = conn.cursor()
+        cursor.execute('''
+        INSERT INTO dirTracked (dir) VALUES (?)''', dir)
+        dirs = cursor.fetchall()
+    except Exception as e:
+        logger.error(e)
+
+    finally:
+        if conn:
+            conn.close()
+
+def RETdirTracked(db:str):
+    try:
+        conn=sqlite3.connect(database=db)
+        cursor=conn.cursor()
+        cursor.execute('''
+        SELECT dir FROM dirTracked''')
+        dirs={dir[0] for dir in cursor.fetchall()}
+        return dirs
+    except Exception as e:
+        logger.error(e)
+
+        
+    except Exception as e:
+        logger.error(e)
+
+    finally:
+        if conn:
+            conn.close()
+    
 # os.makedirs(path)
 
 # conn.close()

@@ -1,11 +1,14 @@
 import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '1'
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-# path=r"/mnt/c/Users/HP/Pictures/Camera Roll"
+# os.environ['TF_ENABLE_ONEDNN_OPTS'] = '1'
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 import numpy as np
 from datetime import datetime
-# from typing import Optional
-def get_img_metadata(path:str):
+from pathlib import Path
+
+from core.logger import logger
+
+def get_img_metadata(path:str, onlyPath:bool):
     img_metadata=[]
     if not os.path.exists(path):
         print(f"Directory {path} does not exist.")
@@ -22,7 +25,7 @@ def get_img_metadata(path:str):
                 os.path.getmtime(os.path.join(root, file)))
             ) for file in files if file.lower().endswith(('jpg', 'jpeg', 'png'))]
             if img_path:
-                img_metadata.extend(img_path)
+                img_metadata.extend(str(img_path))
                 
         if not img_metadata:
             print("no valid img file found, make sure img format is .png, .jpg, .jpeg")
@@ -30,27 +33,11 @@ def get_img_metadata(path:str):
 
 
 
-# detector_backend = 'retinaface'
-# from deepface import DeepFace
-# from label_paths import add_pkl_file, retrieve_imgList
-# def img_find(img_path:str, db_path:str, label:str):
-#     paths = retrieve_imgList(identity=label)
-#     if paths is not None:
-#         return paths
-#     else:
-#         img_path = repr(os.path.abspath(img_path))[1:-1]
-#         db_path = repr(os.path.abspath(db_path))[1:-1]
-#         dfs=DeepFace.find(
-#             img_path=img_path,
-#             db_path=db_path,
-#             detector_backend=detector_backend,
-#             model_name="Facenet512",
-#             enforce_detection=False
-#         )
+# img_path = repr(os.path.abspath(img_path))[1:-1]
+
 #         paths = dfs[0]['identity']
 #         add_pkl_file(label=label, img_paths=list(paths))
 
-#         return paths
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -92,7 +79,43 @@ def track_image_changes(directory, refresh:bool=False, db_embed:str=None, track:
 
     return event_handler.added_image_paths, event_handler.deleted_image_paths
 
-def remove_duplicates(input_list):
+def remove_duplicates(input_list): # maintain the order of elements
     return list(dict.fromkeys(input_list))
 
+
+from core import storage
+def ImgsToProcess(dir:str, db:str):
+    try:
+        p_set=get_parent_dirs(dir)
+        old_dirs = storage.RETdirTracked(db)
+        if old_dirs:
+            pset&=old_dirs
+            if pset:
+                paths ={path for path,_ in get_img_metadata(path=dir)}
+
+    except Exception as e:
+        logger.error(e)
+
+'''REPLACEMENT for PosixPath.parents method'''
+
+def get_parent_dirs(path:str):
+  """Returns a set of all parent directories of the given path."""
+  parent_dirs = set()
+  while True:
+    parent_dir = os.path.dirname(path)
+    if parent_dir == path:
+      break
+    parent_dirs.add(parent_dir)
+    path = parent_dir
+  return parent_dirs
+
+def get_sub_dirs(path:str):
+    subdirs=set()
+    for _, dirs, _ in os.walk(top=path):
+        subdirs.add(dirs)
+
+    return subdirs
+
+def scirpt_dir():
+    return os.path.dirname(os.path.abspath(__file__))
 

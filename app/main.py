@@ -159,30 +159,4 @@ if __name__ == "__main__":
 
 # print("path to images is\n" + dfs[0]['identity'][0])
 
-# import sys
-# import os
-
-# # To Resolve relative import error
-# SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-# sys.path.append(os.path.dirname(SCRIPT_DIR))
-# from utils import track_image_changes, img_find
-
-
-
-
-
-# if __name__ == "__main__":
-#     target_directory = "../ubuntu_img_search"
-#     if os.path.exists(target_directory):
-
-#         added_paths, deleted_paths = track_image_changes(target_directory)
-#         print("Added image files:")
-#         for img in added_paths:
-#             print(img)
-#         print("Deleted image files:")
-#         for img in deleted_paths:
-#             print(img)
-
-#     else:
-#         print(f"path: {target_directory}, doesn't exist")
-
+from Custom_Widgets.Widgets import *
